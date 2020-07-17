@@ -1,59 +1,76 @@
 from django.db import models
-
-# Create your models here.
 from meiduomall.utils.models import BaseModel
 
 
-class ContentCategory(BaseModel):
-    """广告类别表"""
-
-    # 广告类别名称
-    name = models.CharField(max_length=50,
-                            verbose_name='名称')
-    # 广告的类别键名:
-    key = models.CharField(max_length=50,
-                           verbose_name='类别键名')
+class GoodsCategory(BaseModel):
+    """商品类别"""
+    name = models.CharField(max_length=10, verbose_name='名称')
+    parent = models.ForeignKey('self', related_name='subs', null=True, blank=True, on_delete=models.SET_NULL,
+                               verbose_name='父类别')
 
     class Meta:
-        db_table = 'tb_content_category'
-        verbose_name = '广告内容类别'
+        db_table = 'tb_goods_category'
+        verbose_name = '商品类别'
         verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.name
 
 
-class Content(BaseModel):
-    """广告内容表"""
+class GoodsChannelGroup(BaseModel):
+    """商品频道组"""
+    name = models.CharField(max_length=20, verbose_name='频道组名')
 
-    # 外键, 关联广告类别
-    category = models.ForeignKey(ContentCategory,
-                                 on_delete=models.PROTECT,
-                                 verbose_name='类别')
-    # 广告标题
-    title = models.CharField(max_length=100,
-                             verbose_name='标题')
-    # 广告被点击后跳转的 url
-    url = models.CharField(max_length=300,
-                           verbose_name='内容链接')
-    # 广告图片地址保存字段:
-    image = models.ImageField(null=True,
-                              blank=True,
-                              verbose_name='图片')
-    # 文字性广告保存在该字段:
-    text = models.TextField(null=True,
-                            blank=True,
-                            verbose_name='内容')
-    # 广告内容排序:
+    class Meta:
+        db_table = 'tb_channel_group'
+        verbose_name = '商品频道组'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+
+class GoodsChannel(BaseModel):
+    """商品频道"""
+    group = models.ForeignKey(GoodsChannelGroup, verbose_name='频道组名',on_delete=models.SET_DEFAULT,default=20)
+    category = models.ForeignKey(GoodsCategory, on_delete=models.CASCADE, verbose_name='顶级商品类别')
+    url = models.CharField(max_length=50, verbose_name='频道页面链接')
+    sequence = models.IntegerField(verbose_name='组内顺序')
+
+    class Meta:
+        db_table = 'tb_goods_channel'
+        verbose_name = '商品频道'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.category.name
+
+
+
+class ContentCategory(BaseModel):
+    """广告内容类别"""
+    name = models.CharField(max_length=50, verbose_name='名称')
+    key = models.CharField(max_length=50, verbose_name='类别键名')
+
+    class Meta:
+        db_table = 'tb_content_category'
+
+    def __str__(self):
+        return self.name
+
+
+class Content(BaseModel):
+    """广告内容"""
+    category = models.ForeignKey(ContentCategory, on_delete=models.PROTECT, verbose_name='类别')
+    title = models.CharField(max_length=100, verbose_name='标题')
+    url = models.CharField(max_length=300, verbose_name='内容链接')
+    image = models.ImageField(null=True, blank=True, verbose_name='图片')
+    text = models.TextField(null=True, blank=True, verbose_name='内容')
     sequence = models.IntegerField(verbose_name='排序')
-    # 广告是否展示的状态:
-    status = models.BooleanField(default=True,
-                                 verbose_name='是否展示')
+    status = models.BooleanField(default=True, verbose_name='是否展示')
 
     class Meta:
         db_table = 'tb_content'
-        verbose_name = '广告内容'
-        verbose_name_plural = verbose_name
 
     def __str__(self):
         return self.category.name + ': ' + self.title
