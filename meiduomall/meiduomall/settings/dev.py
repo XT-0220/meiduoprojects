@@ -276,3 +276,9 @@ HAYSTACK_CONNECTIONS = {
         'INDEX_NAME': 'meiduo_mall', # Elasticsearch建立的索引库的名称
     },
 }
+
+# 当添加、修改、删除数据时，自动生成索引
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+# 指定haystack分页时每页记录的个数
+HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
