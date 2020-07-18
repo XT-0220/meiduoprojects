@@ -40,6 +40,9 @@ INSTALLED_APPS = [
     'apps.users',
     'apps.verifications',
     'apps.contents',
+    'apps.goods',
+    'django_crontab', # 定时任务
+    'haystack',# 全文检索
 ]
 
 MIDDLEWARE = [
@@ -83,7 +86,7 @@ DATABASES = {
         'PORT': '3306',
         'USER': 'root',
         'PASSWORD': 'mysql',
-        'NAME': 'meiduo_mall'
+        'NAME': 'meiduo_malls'
     }
 }
 
@@ -244,3 +247,32 @@ LOGGING = {
 
 # 指定本项目使用我们自定义的模型类:
 AUTH_USER_MODEL = 'users.User'
+
+
+
+# 定时任务
+CRONJOBS = [
+    # 每1分钟生成一次首页静态文件
+    # ('定时时间', '定时任务', '>> ' + '日志文件路径')
+    ('*/1 * * * *', 'apps.contents.crons.generate_static_index_html', '>> ' + os.path.join(BASE_DIR, 'logs/crontab.log'))
+]
+# 定义任务，默认不识别中文编码
+# 解决 crontab 中文问题
+CRONTAB_COMMAND_PREFIX = 'LANG_ALL=zh_cn.UTF-8'
+
+# 指定自定义的文件存储类
+DEFAULT_FILE_STORAGE = 'meiduomall.utils.fastdfs.fdfs_storage.FastDFSStorage'
+
+# 指定FastDFS服务器的位置
+# FDFS_URL = 'http://192.168.103.100:8888/'
+FDFS_URL = 'http://image.meiduo.site:8888/'
+
+
+# Haystack
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        'ENGINE': 'haystack.backends.elasticsearch_backend.ElasticsearchSearchEngine',
+        'URL': 'http://192.168.83.139:9200/', # Elasticsearch服务器ip地址，端口号固定为9200
+        'INDEX_NAME': 'meiduo_mall', # Elasticsearch建立的索引库的名称
+    },
+}

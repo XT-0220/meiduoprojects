@@ -21,6 +21,10 @@ urlpatterns = [
 
     path('',include('apps.users.urls')),
 
-    # path('',include('apps.verifications.urls')),
+    path('',include('apps.goods.urls')),
+
+    path('',include('apps.contents.urls')),
+
+    path('',include('apps.verifications.urls')),
 
 ]
