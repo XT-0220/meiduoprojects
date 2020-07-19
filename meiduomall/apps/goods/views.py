@@ -62,3 +62,11 @@ class ListView(View):
             'list':list,
             'count':total_page
         })
+
+
+class HotGoodsView(View):
+    pass
+
+
+class MySearchView(object):
+    pass

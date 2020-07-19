@@ -56,4 +56,4 @@ from apps.contents.models import GoodsCategory, GoodsChannel, ContentCategory
 #
 #         pass
 
-# contents  goods  fastdfs的配置 docker的配置 前端index的渲染  修改前端文件   update detail.js  templates的增加  scripts的脚本文件
+#
