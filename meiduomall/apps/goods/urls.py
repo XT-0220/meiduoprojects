@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, re_path
 
 from . import views
 
@@ -11,5 +11,5 @@ urlpatterns = [
 
     # 自定义商品搜索视图: GET /search/
     # 千万不要去调用as_view()，这是唯一不同的地方
-    path('search/', views.MySearchView()),
+    re_path(r'^search/$', views.MySearchView()),
 ]

@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import re_path, path
 from . import views
 
 urlpatterns = [
@@ -7,6 +7,7 @@ urlpatterns = [
 
     re_path(r'^mobiles/(?P<mobile>1[3-9]\d{9})/count/$',views.MobileCountView.as_view()),
 
-
+    # 用户注册:POST http://www.meiduo.site:8000/register/
+    path('register/', views.RegisterView.as_view()),
 
 ]
