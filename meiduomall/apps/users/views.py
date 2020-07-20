@@ -5,6 +5,8 @@ from django import http
 from django.contrib.auth import login
 from django_redis import get_redis_connection
 
+from apps.goods.models import SKU
+from meiduomall.utils.views import LoginRequiredJSONMixin
 from apps.users.models import User
 import logging
 from django.shortcuts import render
@@ -120,3 +122,78 @@ class RegisterView(View):
 
         # 响应结果：如果注册成功，前端会把用户引导到首页
         return response
+
+
+class UserBrowseHistory(LoginRequiredJSONMixin,View):
+
+    def post(self,request):
+        """保存用户浏览记录"""
+        # 接收参数
+        json_dict = json.loads(request.body.deccode())
+        sku_id = json_dict.get('sku_id')
+
+
+        # 校验参数
+        try:
+            SKU.obiects.get(id = sku_id)
+        except SKU.DoesNotExist:
+            return http.JsonResponse({'code': 400, 'errmsg': '参数sku_id错误'})
+
+
+        # 实现核心逻辑
+        # 操作redis的4号库，保存sku_id作为浏览记录
+        user_id = request.user.id
+        # 创建连接到redis4号库的对象
+        redis_conn = get_redis_connection('history')
+
+        pl = redis_conn.pipeline()
+
+        # 先去重
+        pl.lrem('history_%s' % user_id , 0 , sku_id)
+        # 再添加
+        pl.lpush('history_%s' % user_id,sku_id)
+        # 最后截取 ， 截取前5个（0,4）
+        pl.ltrim('history_%s' % user_id,0,4)
+
+        pl.execute()
+
+        # 响应结果
+        return http.JsonResponse({'code': 0, 'errmsg': 'OK'})
+
+
+
+    def get(self,request):
+
+        # 创建redis的连接对象
+        redis_client = get_redis_connection('history')
+        # 使用redis操作list取出所有的sku_id
+        sku_ids = redis_client.lrange('history_%s'%request.user.id , 0 , -1)
+
+        # 使用sku_id获取sku对象
+        sku_list = []
+        for sku_id in sku_ids:
+            sku = SKU.objects.get(id = sku_id)
+
+            sku_list.append({
+                'id':sku_id,
+                'name':sku.name,
+                'default_image_url':sku.default_image.url,
+                'price':sku.price
+            })
+
+        # 返回响应
+        return http.JsonResponse({'code':0,'errmsg':sku_list})
+
+
+
+
+
+
+
+
+
+
+
+
+
+

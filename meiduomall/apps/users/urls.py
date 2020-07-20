@@ -10,4 +10,6 @@ urlpatterns = [
     # 用户注册:POST http://www.meiduo.site:8000/register/
     path('register/', views.RegisterView.as_view()),
 
+    path('browse_histories/',views.UserBrowseHistory.as_view()),
+
 ]
