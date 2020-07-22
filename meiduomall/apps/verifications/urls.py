@@ -13,4 +13,5 @@ urlpatterns = [
     # 短信验证码：GET http://www.meiduo.site:8000/sms_codes/(?P<mobile>1[3-9]\d{9})/
     # path('sms_codes/<mobile:mobile>/', views.SMSCodeView.as_view()),
     re_path(r'^sms_codes/(?P<mobile>1[3-9]\d{9})/$', views.SMSCodeView.as_view()),
+
 ]

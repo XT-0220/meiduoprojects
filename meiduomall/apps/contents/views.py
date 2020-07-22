@@ -5,7 +5,7 @@ from django.views import View
 
 from apps.contents.models import GoodsCategory, GoodsChannel, ContentCategory
 
-
+#
 # class IndexView(View):
 #
 #     def get(self,request):
@@ -55,5 +55,5 @@ from apps.contents.models import GoodsCategory, GoodsChannel, ContentCategory
 #             contents[content_cat.key] = content_cat.content_set.filter(status=True).order_by('sequence')
 #
 #         pass
-
+#
 #

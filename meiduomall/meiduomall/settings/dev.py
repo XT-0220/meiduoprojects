@@ -44,6 +44,10 @@ INSTALLED_APPS = [
     'django_crontab', # 定时任务
     'haystack',# 全文检索
     'corsheaders',
+    'apps.areas',
+    'apps.oauth',
+    'apps.orders',
+    'apps.payment',
 
 ]
 
@@ -55,7 +59,17 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 ]
+
+
+# CORS跨域请求白名单设置
+CORS_ORIGIN_WHITELIST = (
+    'http://127.0.0.1:8080',
+    'http://localhost:8080',
+    'http://www.meiduo.site:8080',
+)
+CORS_ALLOW_CREDENTIALS = True  # 允许携带cookie
 
 ROOT_URLCONF = 'meiduomall.urls'
 
@@ -117,14 +131,14 @@ CACHES = {
     },
     "history": { # 用户浏览记录
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.103.100:6379/4",
+        "LOCATION": "redis://127.0.0.1:6379/4",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     },
     "carts": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://192.168.103.100:6379/5",
+        "LOCATION": "redis://127.0.0.1:6379/5",
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -264,7 +278,22 @@ LOGGING = {
 # 指定本项目使用我们自定义的模型类:
 AUTH_USER_MODEL = 'users.User'
 
+# QQ登录参数
+QQ_CLIENT_ID = '101474184' # 我们申请的客户端id
+QQ_CLIENT_SECRET = 'c6ce949e04e12ecc909ae6a8b09b637c' # 我们申请的客户端秘钥
+QQ_REDIRECT_URI = 'http://www.meiduo.site:8080/oauth_callback.html' # 登录成功后回调的路径
 
+
+
+# 配置邮件服务器：send_mail()方法会去使用这些配置参数，连接到SMTP服务器上
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend' # 指定邮件后端
+EMAIL_HOST = 'smtp.163.com' # 发邮件主机
+EMAIL_PORT = 25 # 发邮件端口
+EMAIL_HOST_USER = 'j_xt0220@163.com' # 授权的邮箱
+EMAIL_HOST_PASSWORD = 'HADMPIWQGGPTSPWH' # 邮箱授权时获得的密码，非注册登录密码
+EMAIL_FROM = '美多商城<j_xt0220@163.com>' # 发件人抬头
+# 邮箱激活链接
+EMAIL_VERIFY_URL = 'http://www.meiduo.site:8080/success_verify_email.html?token='
 
 # 定时任务
 CRONJOBS = [
@@ -298,3 +327,4 @@ HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
 
 # 指定haystack分页时每页记录的个数
 HAYSTACK_SEARCH_RESULTS_PER_PAGE = 5
+

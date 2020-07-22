@@ -104,7 +104,6 @@ class HotGoodsView(View):
             })
         return http.JsonResponse({'code': 0, 'errmsg': 'OK', 'hot_skus': hot_skus})
 
-
 class MySearchView(SearchView):
     """自定义商品搜索视图
      目的：为了重写create_response(),并返回检索后的JSON数据
