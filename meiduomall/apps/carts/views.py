@@ -290,3 +290,4 @@ class CartSelectAllView(View):
 
                 response.set_cookie('carts',cart_data)
             return response
+
