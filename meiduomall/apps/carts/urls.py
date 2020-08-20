@@ -7,7 +7,6 @@ urlpatterns = [
 
     path('carts/selection/',views.CartSelectAllView.as_view()),
 
-
-
+    re_path(r'^carts/simple/$', views.SimpleCartsView.as_view()),
 
 ]

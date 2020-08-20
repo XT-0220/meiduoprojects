@@ -1,6 +1,7 @@
 import json,pickle,base64
 from django import http
 from django.conf.locale import pl
+from django.http import JsonResponse
 from django.shortcuts import render
 # Create your views here.
 from django.views import View
@@ -291,3 +292,72 @@ class CartSelectAllView(View):
                 response.set_cookie('carts',cart_data)
             return response
 
+
+class SimpleCartsView(View):
+
+    def get(self, request):
+        '''返回简易购物车功能'''
+        # 1.判断用户是否登录
+        if request.user.is_authenticated:
+            # 2.如果用户登录: 链接redis, 获取链接对象
+            redis_conn = get_redis_connection('carts')
+
+            # 3.从hash中取出对应的数据
+            # item_dict: {sku_id1 : count1, sku_id2:count2, ...}
+            item_dict = redis_conn.hgetall('carts_%s' % request.user.id)
+
+            # 4.从set中取出对应的数据 :
+            # selected_carts:  {sku_id1, sku_id2, ...}
+            selected_carts = redis_conn.smembers('selected_%s' % request.user.id)
+
+            dict = {}
+            # 5.把hash + set中有用的数据提取出来放入一个dict中,该dict格式和cookie中dict一样
+            for sku_id, count in item_dict.items():
+                dict[int(sku_id)] = {
+                    'count': int(count),
+                    'selected': sku_id in selected_carts
+                }
+
+        else:
+            # 6.如果用户未登录: 从cookie中取出保存的数据
+            cookie_cart = request.COOKIES.get('carts')
+
+            # 7.判断该数据是否存在, 如果该数据存在 ----> 解密 ----> 得到dict
+            if cookie_cart:
+                dict = pickle.loads(base64.b64decode(cookie_cart))
+            else:
+                # 8.如果该数据不存在 -----> 创建新的dict
+                dict = {}
+
+        # 9.统一处理:
+        # {
+        #     sku_id : {
+        #         'count':count,
+        #         'selected':True/False
+        #     }
+        # }
+        # 10.从dict中获取该dict的所有key值 ===> sku_ids
+        sku_ids = dict.keys()
+
+        # 11.把sku_ids转为skus
+        try:
+            skus = SKU.objects.filter(id__in=sku_ids)
+        except Exception as e:
+            return JsonResponse({'code': 400,
+                                 'errmsg': '获取商品数据出错'})
+
+        list = []
+        # 12.遍历skus, 获取每一个sku
+        for sku in skus:
+            # 13.把sku的相关属性存入 ----> {}  ----> []
+            list.append({
+                'id': sku.id,
+                'name': sku.name,
+                'default_image_url': sku.default_image.url,
+                'count': dict.get(sku.id).get('count'),
+            })
+
+        # 14.把[]转为json格式, 返回
+        return JsonResponse({'code': 0,
+                             'errmsg': 'ok',
+                             'cart_skus': list})
