@@ -19,23 +19,23 @@ from django.urls import path, include
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    path('', include('apps.users.urls')),
+    path(r'', include('apps.users.urls')),
 
-    path('', include('apps.verifications.urls')),
+    path(r'', include('apps.verifications.urls')),
 
-    path('', include('apps.contents.urls')),
+    path(r'', include('apps.contents.urls')),
 
-    path('', include('apps.goods.urls')),
+    path(r'', include('apps.goods.urls')),
 
-    path('',include('apps.oauth.urls')),
+    path(r'',include('apps.oauth.urls')),
 
-    path('', include('apps.areas.urls')),
+    path(r'', include('apps.areas.urls')),
 
-    path('', include('apps.carts.urls')),
+    path(r'', include('apps.carts.urls')),
 
-    path('', include('apps.orders.urls')),
+    path(r'', include('apps.orders.urls')),
 
-    path('', include('apps.payment.urls')),
+    path(r'', include('apps.payment.urls')),
 
 
 
